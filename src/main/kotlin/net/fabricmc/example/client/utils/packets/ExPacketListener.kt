@@ -52,7 +52,8 @@ class ExPacketListener(name: String) : ChannelInboundHandlerAdapter() {
     }
 
     override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
-        // TODO: How do we know which `tick` number the current event happened in?
+        // TODO: How do we know which `tick` number the current event happened in? Is it enough to assume average
+        //       tick speed is constant?
         //  ^ Consider that this code here runs on the network thread
 
         val byteBuffer: ByteBuffer = if (msg is ByteBuf) {
@@ -82,7 +83,7 @@ class ExPacketListener(name: String) : ChannelInboundHandlerAdapter() {
         this.numWrites += 1
         if (this.numWrites % 1000 == 0) {
             bufferedWriter.flush()
-            LOGGER.info("Flushed packets. Total= $numWrites")
+            LOGGER.info("Flushing recorded packets. Total=$numWrites")
         }
 
         ctx.fireChannelRead(msg)
