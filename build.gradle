@@ -1,0 +1,124 @@
+plugins {
+	id 'fabric-loom' version '1.0-SNAPSHOT'
+	id 'maven-publish'
+	id "org.jetbrains.kotlin.jvm" version "1.7.22"
+}
+
+sourceCompatibility = java_version
+targetCompatibility = java_version
+
+archivesBaseName = project.archives_base_name
+version = project.mod_version
+group = project.maven_group
+
+repositories {
+	// Add repositories to retrieve artifacts from in here.
+	// You should only use this when depending on other mods because
+	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
+	// for more information about repositories.
+
+	maven {
+		name = 'ParchmentMC'
+		url = 'https://maven.parchmentmc.org'
+	}
+}
+
+dependencies {
+	// To change the versions see the gradle.properties file
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+
+	// mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	// mappings loom.officialMojangMappings()
+	mappings loom.layered() {
+		officialMojangMappings()
+		parchment("org.parchmentmc.data:parchment-1.19.3:2022.12.18@zip")
+	}
+
+
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+	// Fabric API. This is technically optional, but you probably want it anyway.
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+	// Uncomment the following line to enable the deprecated Fabric API modules. 
+	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
+
+	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
+
+	modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_language_kotlin_version}"
+}
+
+//loom {
+//	splitEnvironmentSourceSets()
+//
+//	mods {
+//		modid {
+//			sourceSet sourceSets.main
+//			sourceSet sourceSets.client
+//		}
+//	}
+//}
+
+processResources {
+	inputs.property "version", project.version
+
+//	filesMatching("fabric.mod.json") {
+//		expand(mutableMapOf(
+//				"version" to project.extra["mod_version"] as String,
+//				"fabricloader" to project.extra["loader_version"] as String,
+//				"fabric_api" to project.extra["fabric_version"] as String,
+//				"fabric_language_kotlin" to project.extra["fabric_language_kotlin_version"] as String,
+//				"minecraft" to project.extra["minecraft_version"] as String,
+//				"java" to project.extra["java_version"] as String)) }
+
+	filesMatching("fabric.mod.json") {
+		expand "version": project.version
+	}
+
+	filesMatching("*.mixins.json") {
+		expand "java": java_version
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.encoding = "UTF-8"
+	it.sourceCompatibility = java_version.toString()
+	it.targetCompatibility = java_version.toString()
+	it.options.release.set(Integer.parseInt(java_version))
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+	kotlinOptions { jvmTarget = java_version.toString() }
+}
+
+
+java {
+	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+	// if it is present.
+	// If you remove this line, sources will not be generated.
+	withSourcesJar()
+}
+
+jar {
+	from("LICENSE") {
+		rename { "${it}_${project.archivesBaseName}"}
+	}
+}
+
+// configure the maven publication
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+		}
+	}
+
+	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+	repositories {
+		// Add repositories to publish to here.
+		// Notice: This block does NOT have the same function as the block in the top level.
+		// The repositories here will be used for publishing your artifact, not for
+		// retrieving dependencies.
+	}
+}
