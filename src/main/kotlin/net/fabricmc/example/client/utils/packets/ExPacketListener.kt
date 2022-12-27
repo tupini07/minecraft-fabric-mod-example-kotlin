@@ -97,7 +97,7 @@ class ExPacketListener(name: String) : ChannelInboundHandlerAdapter() {
 
             val packet: Packet<*>? = ctx
                 .channel()
-                .attr<ConnectionProtocol>(Connection.ATTRIBUTE_PROTOCOL)
+                .attr(Connection.ATTRIBUTE_PROTOCOL)
                 .get()
                 .createPacket(PacketFlow.CLIENTBOUND, j, friendlybytebuf)
 
