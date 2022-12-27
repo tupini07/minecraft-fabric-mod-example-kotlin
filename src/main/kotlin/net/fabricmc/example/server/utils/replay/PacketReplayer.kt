@@ -1,7 +1,6 @@
-package net.fabricmc.example.client.utils.replay
+package net.fabricmc.example.server.utils.replay
 
-import io.netty.channel.embedded.EmbeddedChannel
-import net.fabricmc.example.mixin.ClientPacketListenerAccessor
+import net.fabricmc.example.mixin.ConnectionAccessor
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientHandshakePacketListenerImpl
@@ -9,6 +8,8 @@ import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.network.Connection
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.PacketFlow
+import net.minecraft.server.MinecraftServer
+import net.minecraft.server.network.ServerHandshakePacketListenerImpl
 
 class PacketReplayer {
     val replaySpeed = 1.0
@@ -23,27 +24,31 @@ class PacketReplayer {
 
         val networkManager = Connection(PacketFlow.CLIENTBOUND)
 
-        networkManager.setListener(ClientHandshakePacketListenerImpl(networkManager,
-            Minecraft.getInstance(),
-            null,
-            null,
-            false,
-            null,
-            { _ -> }
+        networkManager.setListener(ServerHandshakePacketListenerImpl(
+            Minecraft.getInstance().singleplayerServer!!,
+            networkManager
         ))
 
-        val channel = EmbeddedChannel()
+//        val channel = EmbeddedChannel()
+        val conn = Minecraft
+            .getInstance()
+            .connection!!
+            .connection!! as ConnectionAccessor
 
-        channel.pipeline().addLast("custom_replay_sender", ReplaySender())
-        channel.pipeline().addLast("packet_handler", networkManager)
+        val channel = conn.getChannel().pipeline().channel()!!
+
+        // TODO we also have the option to 'replace'
+        channel.pipeline().remove("packet_handler")
+
+        channel.pipeline().addFirst("packet_handler", networkManager)
+        channel.pipeline().addFirst("custom_replay_sender", ReplaySender())
+
         channel.pipeline().fireChannelActive()
 
-        val clientPacketListener =
-            Minecraft.getInstance().player!!.connection as ClientPacketListenerAccessor
-
-        clientPacketListener.setConnection(networkManager)
-
-        connection = networkManager
+        connection = Minecraft
+            .getInstance()
+            .connection!!
+            .connection
 
         // ChunkManager -> ChunkSource in Mojang mappings
 //        net.minecraft.world.level.chunk.ChunkSource

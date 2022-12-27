@@ -1,4 +1,4 @@
-package net.fabricmc.example.client.utils.replay
+package net.fabricmc.example.server.utils.replay
 
 import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext

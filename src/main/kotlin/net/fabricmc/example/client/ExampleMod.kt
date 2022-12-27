@@ -2,7 +2,6 @@ package net.fabricmc.example.client
 
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.example.client.commands.SayHiCommand
-import net.fabricmc.example.client.commands.TestReplayCommand
 import net.fabricmc.example.client.utils.packets.ExPacketListener
 import net.fabricmc.example.mixin.ConnectionAccessor
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
@@ -21,10 +20,9 @@ class ExampleMod : ClientModInitializer {
         ClientCommandRegistrationCallback.EVENT.register(ClientCommandRegistrationCallback { dispatcher, _ ->
             // Register your commands here
             SayHiCommand().register(dispatcher)
-            TestReplayCommand().register(dispatcher)
         })
 
-        ClientPlayConnectionEvents.JOIN.register(ClientPlayConnectionEvents.Join { handler, _sender, _client ->
+        ClientPlayConnectionEvents.JOIN.register(ClientPlayConnectionEvents.Join { handler, _, _ ->
             // This code runs when the player joins a world
             LOGGER.info("Player connected to logical server")
 
