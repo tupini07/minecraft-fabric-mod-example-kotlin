@@ -2,6 +2,7 @@ package net.fabricmc.example.client
 
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.example.client.commands.SayHiCommand
+import net.fabricmc.example.client.commands.TestReplayCommand
 import net.fabricmc.example.client.utils.packets.ExPacketListener
 import net.fabricmc.example.mixin.ConnectionAccessor
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
@@ -19,7 +20,8 @@ class ExampleMod : ClientModInitializer {
 
         ClientCommandRegistrationCallback.EVENT.register(ClientCommandRegistrationCallback { dispatcher, _ ->
             // Register your commands here
-            SayHiCommand.register(dispatcher)
+            SayHiCommand().register(dispatcher)
+            TestReplayCommand().register(dispatcher)
         })
 
         ClientPlayConnectionEvents.JOIN.register(ClientPlayConnectionEvents.Join { handler, _sender, _client ->
@@ -40,16 +42,6 @@ class ExampleMod : ClientModInitializer {
 //        Minecraft.getInstance().options!!.renderDistance().set(64)
 //        Minecraft.getInstance().options!!.overrideWidth = 512
 //        Minecraft.getInstance().options!!.overrideHeight = 512
-
-
-//        val minecraft = Minecraft.getInstance() as MinecraftClientAccessor
-
-
-//        ClientPlayNetworking.registerGlobalReceiver(ResourceLocation("modid:potato")) {
-//                client: Minecraft?, handler: ClientPacketListener?, buf: FriendlyByteBuf?, resp: PacketSender? ->
-//            handler.
-//        }
-
     }
 
     companion object {
