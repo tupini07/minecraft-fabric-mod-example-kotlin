@@ -1,7 +1,7 @@
 package net.fabricmc.example.client.utils.replay
 
 import io.netty.channel.embedded.EmbeddedChannel
-import net.fabricmc.example.mixin.ClientGamePacketListenerAccessor
+import net.fabricmc.example.mixin.ClientPacketListenerAccessor
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientHandshakePacketListenerImpl
@@ -39,7 +39,7 @@ class PacketReplayer {
         channel.pipeline().fireChannelActive()
 
         val clientPacketListener =
-            Minecraft.getInstance().player!!.connection!!.connection as ClientGamePacketListenerAccessor
+            Minecraft.getInstance().player!!.connection as ClientPacketListenerAccessor
 
         clientPacketListener.setConnection(networkManager)
 
