@@ -19,7 +19,9 @@
   "environment": "*",
   "entrypoints": {
     "main": [],
-    "server": [],
+    "server": [
+      "net.fabricmc.example.server.ExampleModServer"
+    ],
     "client": [
       "net.fabricmc.example.client.ExampleMod"
     ]
